@@ -19,17 +19,16 @@ const test = async (token) => {
                 scope: DEFAULT_SCOPE,
             },
         })
-        let auth = [token_type, access_token].join('')
+        let auth = [token_type, access_token].join(' ')
         return auth
     } catch (error) {
         console.log(`Error: ${error.message}`)
     }
 }
-app.get(PREFIX + '/token', async (req, res) => {
+app.get(PREFIX + '/token',  (req, res) => {
     // console.log(req.query.CLIENT_ID)
     const requestToken = btoa(`${req.query.client_id}:${req.query.client_secret}`);
     const token = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`)
-    console.log(token , "---", requestToken)
     if (requestToken != token) {
         //console.log(requestToken , "--->", token)
         res.setHeader('Content-Type', 'application/json')
@@ -38,11 +37,12 @@ app.get(PREFIX + '/token', async (req, res) => {
     } else {
         test(token).then((authorization) => {
             //const [authType, token] = auth.split(' ')
+            console.log(authorization)
             res.setHeader('Content-Type', 'application/json')
             res.status(200)
             const [authType, access_token] = authorization.split(' ')
             var response =
-             { 
+            { 
                  "scope" : DEFAULT_SCOPE,
                  "expires_in": 3600,
                  "token_type": authType,
