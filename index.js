@@ -8,7 +8,7 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-const getToken = async (token) => {
+let getToken = async (token) => {
     try {
         const { token_type, access_token } = await request({
             uri: `${ISSUER}/v1/token`,
@@ -39,19 +39,16 @@ app.post(PREFIX + '/token', async (req, res) => {
         var requestToken = btoa(`${client_id}:${client_secret}`);
         var token = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`)
         if (requestToken != token) {
-            //console.log(requestToken , "--->", token)
             res.setHeader('Content-Type', 'application/json')
             res.status(401)
             res.json({ "Error 401 ": "Unauthorized" })
         } else {
             getToken(token).then((authorization) => {
                 if (typeof authorization != "undefined") {
-                    //const [authType, token] = auth.split(' ')
-                    console.log("========", authorization)
                     var [authType, access_token] = authorization.split(' ')
                     var response = {
                         "scope": scope,
-                        "expires_in": 3600,
+                        "expires_in": "3600s",
                         "token_type": authType,
                         "access_token": access_token,
                     }
