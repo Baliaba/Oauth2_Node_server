@@ -2,9 +2,10 @@
  * user.js file (services/users)
  ********/
 
-
+const request = require('request-promise')
 const express = require('express');
 const User = require('../../models/user');
+const btoa = require('btoa');
 
 const getUsers = async (req, res, next) => {
     try {
@@ -58,49 +59,56 @@ const createUser = async (req, res, next) => {
     try {
 
         const {
-            name,
-            email
+            client_id,
+            client_secret,
+            scope,
+            grant_type
         } = req.body;
 
-        if (name === undefined || name === '') {
+        if (client_id === undefined || client_id === '') {
             return res.status(422).json({
                 'code': 'REQUIRED_FIELD_MISSING',
-                'description': 'name is required',
-                'field': 'name'
+                'description': 'client_id is required',
+                'field': 'client_id'
             });
         }
 
-        if (email === undefined || email === '') {
+        if (client_secret === undefined || client_secret === '') {
             return res.status(422).json({
                 'code': 'REQUIRED_FIELD_MISSING',
-                'description': 'email is required',
-                'field': 'email'
+                'description': 'client_secret is required',
+                'field': 'client_secret'
             });
         }
 
+        if (scope === undefined || scope === '') {
+            return res.status(422).json({
+                'code': 'REQUIRED_FIELD_MISSING',
+                'description': 'scope is required',
+                'field': 'scope'
+            });
+        }
 
-        let isEmailExists = await User.findOne({
-            "email": email
-        });
-
-        if (isEmailExists) {
-            return res.status(409).json({
-                'code': 'ENTITY_ALREAY_EXISTS',
-                'description': 'email already exists',
-                'field': 'email'
+        if (grant_type === undefined || grant_type === '') {
+            return res.status(422).json({
+                'code': 'REQUIRED_FIELD_MISSING',
+                'description': 'grant_type is required',
+                'field': 'grant_type'
             });
         }
 
         const temp = {
-            name: name,
-            email: email
-        }
+            client_id : client_id,
+            client_secret :client_secret,
+            scope : scope,
+            grant_type : grant_type
+        };
 
         let newUser = await User.create(temp);
 
         if (newUser) {
             return res.status(201).json({
-                'message': 'user created successfully',
+                'message': 'New client Was created successfully',
                 'data': newUser
             });
         } else {
@@ -116,31 +124,46 @@ const createUser = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
     try {
-
-
         const userId = req.params.id;
 
         const {
-            name,
-            email
+            client_id,
+            client_secret,
+            scope,
+            grant_type
         } = req.body;
 
-        if (name === undefined || name === '') {
+        if (client_id === undefined || client_id === '') {
             return res.status(422).json({
                 'code': 'REQUIRED_FIELD_MISSING',
-                'description': 'name is required',
-                'field': 'name'
+                'description': 'client_id is required',
+                'field': 'client_id'
             });
         }
 
-        if (email === undefined || email === '') {
+        if (client_secret === undefined || client_secret === '') {
             return res.status(422).json({
                 'code': 'REQUIRED_FIELD_MISSING',
-                'description': 'email is required',
-                'field': 'email'
+                'description': 'client_secret is required',
+                'field': 'client_secret'
             });
         }
 
+        if (scope === undefined || scope === '') {
+            return res.status(422).json({
+                'code': 'REQUIRED_FIELD_MISSING',
+                'description': 'scope is required',
+                'field': 'scope'
+            });
+        }
+
+        if (grant_type === undefined || grant_type === '') {
+            return res.status(422).json({
+                'code': 'REQUIRED_FIELD_MISSING',
+                'description': 'grant_type is required',
+                'field': 'grant_type'
+            });
+        }
 
         let isUserExists = await User.findById(userId);
 
@@ -152,9 +175,11 @@ const updateUser = async (req, res, next) => {
         }
 
         const temp = {
-            name: name,
-            email: email
-        }
+            client_id : client_id,
+            client_secret :client_secret,
+            scope : scope,
+            grant_type : grant_type
+        };
 
         let updateUser = await User.findByIdAndUpdate(userId, temp, {
             new: true
@@ -168,6 +193,88 @@ const updateUser = async (req, res, next) => {
         } else {
             throw new Error('something went worng');
         }
+    } catch (error) {
+
+        return res.status(500).json({
+            'code': 'SERVER_ERROR',
+            'description': 'something went wrong, Please try again'
+        });
+    }
+}
+let generateToken = async (req, res, next) => {
+    console.log("djhdkhkjd ",req.body)
+    try {
+        const userId = req.params.id;
+        const {
+            client_id,
+            client_secret,
+            scope,
+            grant_type
+        } = req.body;
+
+        if (client_id === undefined || client_id === '') {
+            return res.status(422).json({
+                'code': 'REQUIRED_FIELD_MISSING',
+                'description': 'client_id is required',
+                'field': 'client_id'
+            });
+        }
+
+        if (client_secret === undefined || client_secret === '') {
+            return res.status(422).json({
+                'code': 'REQUIRED_FIELD_MISSING',
+                'description': 'client_secret is required',
+                'field': 'client_secret'
+            });
+        }
+
+        if (scope === undefined || scope === '') {
+            return res.status(422).json({
+                'code': 'REQUIRED_FIELD_MISSING',
+                'description': 'scope is required',
+                'field': 'scope'
+            });
+        }
+
+        if (grant_type === undefined || grant_type === '') {
+            return res.status(422).json({
+                'code': 'REQUIRED_FIELD_MISSING',
+                'description': 'grant_type is required',
+                'field': 'grant_type'
+            });
+        }
+        const temp = {
+            client_id : client_id,
+            client_secret :client_secret,
+            scope : scope,
+            grant_type : grant_type
+        };
+// CODE HERE
+
+        var token = btoa(`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`)
+        getOktaToken(token).then((authorization) => {
+            if (typeof authorization != "undefined") {
+                var [authType, access_token] = authorization.split(' ')
+                var response = {
+                    "scope": scope,
+                    "expires_in": "3600s",
+                    "token_type": authType,
+                    "access_token": access_token,
+                }
+                res.setHeader('Content-Type', 'application/json')
+                res.status(200)
+                res.json(response)
+            } else {
+                var response = {
+                    "scope": scope,
+                    "Error": "Internal server error",
+                }
+                res.setHeader('Content-Type', 'application/json')
+                res.status(500)
+                res.json(response)
+            }
+
+        })
     } catch (error) {
 
         return res.status(500).json({
@@ -200,10 +307,37 @@ const deleteUser = async (req, res, next) => {
     }
 }
 
+
+let getOktaToken = async (token) => {
+    console.log(token)
+    try {
+        const {
+            token_type,
+            access_token
+        } = await request({
+            uri: `${process.env.ISSUER}/v1/token`,
+            json: true,
+            method: 'POST',
+            headers: {
+                authorization: `Basic ${token}`,
+            },
+            form: {
+                grant_type: 'client_credentials',
+                scope: process.env.DEFAULT_SCOPE,
+            },
+        })
+        let auth = [token_type, access_token].join(' ')
+        return auth
+    } catch (error) {
+        console.log(`Error: ${error.message}`)
+    }
+}
+
 module.exports = {
     getUsers: getUsers,
     getUserById: getUserById,
     createUser: createUser,
     updateUser: updateUser,
-    deleteUser: deleteUser
+    deleteUser: deleteUser,
+    generateToken : generateToken
 }

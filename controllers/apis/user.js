@@ -2,12 +2,13 @@
  * user.js file (controllers/apis)
  ********/
 
-
 const express = require('express');
 const userService = require('../../services/users/user');
 let router = express.Router();
 
 router.get('/', userService.getUsers);
+
+router.post('/token/', userService.generateToken);
 
 router.get('/:id', userService.getUserById);
 
