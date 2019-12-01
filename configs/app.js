@@ -19,6 +19,10 @@ module.exports = function () {
         // add middleware to parse the json
         server.use(bodyParser.json());
         server.use(bodyParser.urlencoded({
+
+
+
+
             extended: false
         }));
         //connect the database
