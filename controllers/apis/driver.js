@@ -11,8 +11,8 @@ router.get('/', userService.getUsers);
 /**
  * @api {post} api/v1/users/token  get a token for an authenticated client
  * @apiVersion 1.0.0
- * @apiName getToken
- * @apiGroup user
+ * @apiName getDriver
+ * @apiGroup driver
  *
  * @apiParam (Request body) {String} client_id The User client_id
  * @apiParam (Request body) {String} client_secret The User client_secret

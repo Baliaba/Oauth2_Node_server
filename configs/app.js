@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+var apiDoc = require('api-doc');
 
 module.exports = function () {
     let server = express(),
@@ -40,6 +41,7 @@ module.exports = function () {
     };
 
     start = () => {
+        server.get('/apidoc/', apiDoc(server));
         let hostname = server.get('hostname'),
             port = server.get('port');
         server.listen(port, function () {

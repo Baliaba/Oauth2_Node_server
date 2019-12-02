@@ -1,0 +1,7 @@
+{
+  "name": "IFD OAUTH2 API",
+  "version": "1.0.0",
+  "description": "API to generate access token with credentials",
+  "title": "IFD auth API",
+  "url": "oauth2-ifd-server.com/"
+}

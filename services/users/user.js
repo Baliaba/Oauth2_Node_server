@@ -7,6 +7,7 @@ const express = require('express');
 const User = require('../../models/user');
 const btoa = require('btoa');
 
+
 const getUsers = async (req, res, next) => {
     try {
 
@@ -308,7 +309,7 @@ const deleteUser = async (req, res, next) => {
 }
 
 
-let getOktaToken = async (token) => {
+let getOauthToken = async (token) => {
     console.log(token)
     try {
         const {
